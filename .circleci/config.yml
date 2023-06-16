@@ -3,7 +3,7 @@ version: 2.1
 executors:
   python-executor:
     docker:
-      - image: circleci/python:3.9
+      - image: python:3.9-slim
 
 jobs:
   lint:
@@ -11,9 +11,18 @@ jobs:
     steps:
       - checkout
 
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+
       - run:
           name: Install dependencies
           command: pip install -r requirements.txt
+
+      - save_cache:
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+          paths:
+            - ~/.cache/pip
 
       - run:
           name: Run lint
@@ -21,12 +30,22 @@ jobs:
 
   test:
     executor: python-executor
+    parallelism: 2
     steps:
       - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
 
       - run:
           name: Install dependencies
           command: pip install -r requirements.txt
+
+      - save_cache:
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+          paths:
+            - ~/.cache/pip
 
       - run:
           name: Run tests
