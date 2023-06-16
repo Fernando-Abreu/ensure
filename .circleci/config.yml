@@ -3,7 +3,7 @@ version: 2.1
 executors:
   python-executor:
     docker:
-      - image: python:3.9-slim
+      - image: python:3.9
 
 jobs:
   lint:
