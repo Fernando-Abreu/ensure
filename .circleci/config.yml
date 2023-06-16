@@ -10,16 +10,11 @@ jobs:
     executor: python-executor
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
+
       - run:
           name: Install dependencies
           command: pip install -r requirements.txt
-      - save_cache:
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-          paths:
-            - ./venv
+
       - run:
           name: Run lint
           command: make lint
@@ -28,9 +23,11 @@ jobs:
     executor: python-executor
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
+
+      - run:
+          name: Install dependencies
+          command: pip install -r requirements.txt
+
       - run:
           name: Run tests
           command: make test
@@ -40,4 +37,6 @@ workflows:
   build-and-test:
     jobs:
       - lint
-      - test
+      - test:
+          requires:
+            - lint
